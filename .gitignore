@@ -1,0 +1,4 @@
+sample-logs/
+.env
+*.tfstate*
+.terraform/
