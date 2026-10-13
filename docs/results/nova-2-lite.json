@@ -1,0 +1,112 @@
+{
+  "model": "us.amazon.nova-2-lite-v1:0",
+  "passed": "8/8",
+  "tokens_in": 8018,
+  "tokens_out": 2512,
+  "summary": [
+    {
+      "case": "ssh_22",
+      "expected": "high",
+      "got": [
+        "high",
+        "high"
+      ],
+      "pass": true,
+      "causes": [
+        "unclear",
+        "unclear"
+      ]
+    },
+    {
+      "case": "https_443",
+      "expected": "low",
+      "got": [
+        "low",
+        "low"
+      ],
+      "pass": true,
+      "causes": [
+        "benign",
+        "benign"
+      ]
+    },
+    {
+      "case": "rdp_3389",
+      "expected": "high",
+      "got": [
+        "high",
+        "high"
+      ],
+      "pass": true,
+      "causes": [
+        "unclear",
+        "unclear"
+      ]
+    },
+    {
+      "case": "postgres_5432",
+      "expected": "high",
+      "got": [
+        "high",
+        "high"
+      ],
+      "pass": true,
+      "causes": [
+        "unclear",
+        "unclear"
+      ]
+    },
+    {
+      "case": "alt_http_8080",
+      "expected": "medium",
+      "got": [
+        "medium",
+        "medium"
+      ],
+      "pass": true,
+      "causes": [
+        "unclear",
+        "unclear"
+      ]
+    },
+    {
+      "case": "all_traffic",
+      "expected": "high",
+      "got": [
+        "high",
+        "high"
+      ],
+      "pass": true,
+      "causes": [
+        "unclear",
+        "unclear"
+      ]
+    },
+    {
+      "case": "mixed_80_and_22",
+      "expected": "high",
+      "got": [
+        "high",
+        "high"
+      ],
+      "pass": true,
+      "causes": [
+        "unclear",
+        "unclear"
+      ]
+    },
+    {
+      "case": "injection_in_user",
+      "expected": "high",
+      "got": [
+        "high",
+        "high"
+      ],
+      "pass": true,
+      "causes": [
+        "unclear",
+        "unclear"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+model | passed | tokens_in | tokens_out | duration_ms | avg_ms_per_call | run_date
+us.amazon.nova-2-lite-v1:0 | PASSED | IN | OUT | 18304 | 1144 | 2026-10-13
+amazon.nova-lite-v1:0 | PASSED | IN | OUT | 12028 | 752 | 2026-10-13
+amazon.nova-micro-v1:0 | PASSED | IN | OUT | 9804 | 613 | 2026-10-13

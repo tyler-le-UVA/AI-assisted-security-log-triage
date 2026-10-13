@@ -1,0 +1,3 @@
+Nova 2 Lite: REPORT RequestId: 5cfb8e48-0adb-4f1f-b5d1-a65bc1c8a949	Duration: 18303.51 ms	Billed Duration: 18745 ms	Memory Size: 128 MB	Max Memory Used: 87 MB	Init Duration: 440.68 ms
+Nova Lite: REPORT RequestId: af0fba70-ea0e-45cc-8bbe-9d4287017234	Duration: 12027.78 ms	Billed Duration: 12508 ms	Memory Size: 128 MB	Max Memory Used: 89 MB	Init Duration: 479.96 ms
+Nova Micro: REPORT RequestId: 091f6775-88cc-4943-9736-da101dae5b26	Duration: 9804.14 ms	Billed Duration: 10279 ms	Memory Size: 128 MB	Max Memory Used: 90 MB	Init Duration: 474.07 ms
