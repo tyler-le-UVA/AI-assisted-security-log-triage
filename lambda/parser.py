@@ -34,6 +34,38 @@ SYSTEM_PROMPT = (
 
 PROMPT_FIELDS = ("rule", "event_time", "user", "source_ip", "region", "group_id", "exposed")
 
+SEVERITY_ORDER = {"low": 0, "medium": 1, "high": 2, "critical": 3}
+HIGH_RISK_PORTS = {22, 3389, 3306, 5432, 1433, 1521, 5900, 6379, 9200, 11211, 27017}
+WEB_PORTS = {80, 443}
+
+
+def severity_floor(finding):
+    worst = "low"
+    for item in finding.get("exposed") or []:
+        protocol = str(item.get("protocol"))
+        lo, hi = item.get("from_port"), item.get("to_port")
+        if protocol == "-1":
+            level = "high"
+        elif lo is None or hi is None:
+            level = "medium"
+        else:
+            lo, hi = int(lo), int(hi)
+            if any(lo <= p <= hi for p in HIGH_RISK_PORTS):
+                level = "high"
+            elif lo == hi and lo in WEB_PORTS:
+                level = "low"
+            else:
+                level = "medium"
+        if SEVERITY_ORDER[level] > SEVERITY_ORDER[worst]:
+            worst = level
+    return worst
+
+
+def combine_severity(floor, llm):
+    if llm not in SEVERITY_ORDER:
+        return floor
+    return max(floor, llm, key=SEVERITY_ORDER.get)
+
 
 def sg_open_to_world(e):
     if e.get("eventName") != "AuthorizeSecurityGroupIngress" or e.get("errorCode"):
@@ -66,6 +98,18 @@ def sg_open_to_world(e):
 RULES = [sg_open_to_world]
 
 
+def clean_triage(raw):
+    steps = raw.get("recommended_steps")
+    if not isinstance(steps, list):
+        steps = []
+    return {
+        "severity": str(raw.get("severity", "")).strip().lower(),
+        "explanation": str(raw.get("explanation", ""))[:1000],
+        "likely_cause": str(raw.get("likely_cause", "")).strip().lower(),
+        "recommended_steps": [str(s)[:300] for s in steps[:3]],
+    }
+
+
 def triage(finding):
     summary = {k: finding.get(k) for k in PROMPT_FIELDS}
     try:
@@ -76,7 +120,7 @@ def triage(finding):
             inferenceConfig={"maxTokens": 400, "temperature": 0.2},
         )
         text = "".join(b.get("text", "") for b in resp["output"]["message"]["content"])
-        return json.loads(text[text.find("{"):text.rfind("}") + 1])
+        return clean_triage(json.loads(text[text.find("{"):text.rfind("}") + 1]))
     except Exception as err:
         print("Triage failed:", repr(err))
         return {"error": "triage_failed"}
@@ -99,12 +143,24 @@ def save_finding(event_id, finding):
 
 def attach_triage(event_id, finding):
     result = triage(finding)
+    floor = severity_floor(finding)
+    llm_sev = result.get("severity")
+    if llm_sev not in SEVERITY_ORDER:
+        llm_sev = None
+    final = combine_severity(floor, llm_sev)
     table.update_item(
         Key={"event_id": event_id},
-        UpdateExpression="SET triage = :t, triage_model = :m",
-        ExpressionAttributeValues={":t": result, ":m": MODEL_ID},
+        UpdateExpression=(
+            "SET triage = :t, triage_model = :m, severity = :s, "
+            "severity_floor = :f, severity_llm = :l, severity_mismatch = :x"
+        ),
+        ExpressionAttributeValues={
+            ":t": result, ":m": MODEL_ID, ":s": final,
+            ":f": floor, ":l": llm_sev, ":x": llm_sev != floor,
+        },
     )
-    print("TRIAGE saved:", event_id, result.get("severity", "-"))
+    print("TRIAGE saved:", event_id, "final", final, "floor", floor, "llm", llm_sev,
+          "MISMATCH" if llm_sev != floor else "")
 
 
 def lambda_handler(event, context):
