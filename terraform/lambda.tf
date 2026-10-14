@@ -30,6 +30,11 @@ resource "aws_lambda_function" "parser" {
     }
   }
 
+  # Code is deployed by GitHub Actions; Terraform manages everything else.
+  lifecycle {
+    ignore_changes = [filename, source_code_hash]
+  }
+
   depends_on = [
     aws_cloudwatch_log_group.parser,
     aws_iam_role_policy.parser,

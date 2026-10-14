@@ -35,5 +35,5 @@ jobs:
           mkdir build
           cp lambda/parser.py build/lambda_function.py
           cd build && zip ../function.zip lambda_function.py && cd ..
-          aws lambda update-function-code --function-name triage-parser --zip-file fileb://function.zip
-          aws lambda wait function-updated --function-name triage-parser
+          aws lambda update-function-code --function-name triage-tf-parser --zip-file fileb://function.zip
+          aws lambda wait function-updated --function-name triage-tf-parser
