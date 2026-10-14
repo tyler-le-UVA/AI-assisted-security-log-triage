@@ -5,3 +5,7 @@ output "log_bucket" {
 output "findings_table" {
   value = aws_dynamodb_table.findings.name
 }
+
+output "parser_function" {
+  value = aws_lambda_function.parser.function_name
+}
