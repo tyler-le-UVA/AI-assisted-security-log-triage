@@ -16,3 +16,24 @@ jobs:
       - run: pip install -r requirements-dev.txt
       - run: python -m py_compile lambda/parser.py eval/prompt_eval.py
       - run: pytest -q
+
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+      - name: Package and deploy triage-parser
+        run: |
+          mkdir build
+          cp lambda/parser.py build/lambda_function.py
+          cd build && zip ../function.zip lambda_function.py && cd ..
+          aws lambda update-function-code --function-name triage-parser --zip-file fileb://function.zip
+          aws lambda wait function-updated --function-name triage-parser
