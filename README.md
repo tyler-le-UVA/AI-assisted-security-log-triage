@@ -32,6 +32,12 @@ flowchart LR
 - **Idempotent writes:** a conditional put on `eventID` prevents duplicate findings.
 - **Model failures don't block detection:** the finding is saved before the model is called, and a failed model call is recorded as an error marker.
 
+## CI/CD
+
+GitHub Actions runs on every push and pull request. It compiles the code and runs unit tests for the detection rules, the severity floor, output validation, and drift checks that keep the evaluation harness in sync with the Lambda (26 tests, no AWS access needed). On pushes to `main`, a deploy job packages `lambda/parser.py` and updates the `triage-parser` function.
+
+The deploy job authenticates to AWS with GitHub OIDC, so no access keys are stored anywhere. The IAM role it assumes trusts only this repository's `main` branch and can only update that one function.
+
 ## Evaluation
 
 The harness in `eval/prompt_eval.py` sends 12 synthetic findings (open SSH, RDP, database ports, all traffic, mixed ports, and two prompt-injection attempts) to a model, twice each, and compares the result with the expected severity.
