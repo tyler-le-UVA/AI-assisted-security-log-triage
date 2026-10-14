@@ -38,6 +38,17 @@ GitHub Actions runs on every push and pull request. It compiles the code and run
 
 The deploy job authenticates to AWS with GitHub OIDC, so no access keys are stored anywhere. The IAM role it assumes trusts only this repository's `main` branch and can only update that one function.
 
+## Infrastructure as code
+
+The whole stack is defined in `terraform/`: the log bucket (encrypted, public access blocked, 90-day lifecycle), the multi-region CloudTrail trail, the DynamoDB findings table, the Lambda with a least-privilege IAM role, and the S3 trigger. Deploy it from AWS CloudShell:
+
+    git clone https://github.com/tyler-le-UVA/AI-assisted-security-log-triage.git repo
+    cd repo/terraform
+    terraform init
+    terraform apply
+
+Resource names use the `triage-tf` prefix (see `variables.tf`). Function code is shipped by the CI/CD deploy job, so Terraform ignores code changes after creation. The AWS provider version is pinned by `.terraform.lock.hcl`.
+
 ## Evaluation
 
 The harness in `eval/prompt_eval.py` sends 12 synthetic findings (open SSH, RDP, database ports, all traffic, mixed ports, and two prompt-injection attempts) to a model, twice each, and compares the result with the expected severity.
