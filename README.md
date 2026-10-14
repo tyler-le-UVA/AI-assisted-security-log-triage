@@ -1,5 +1,7 @@
 # AI-Assisted Security Log Triage
 
+![CI](https://github.com/tyler-le-UVA/AI-assisted-security-log-triage/actions/workflows/ci.yml/badge.svg)
+
 Detects risky changes in an AWS account from CloudTrail logs, then uses an LLM on Amazon Bedrock to explain each finding and suggest next steps. Severity is protected by deterministic code, so text inside a log field cannot talk the system into downgrading a finding.
 
 ## Architecture
