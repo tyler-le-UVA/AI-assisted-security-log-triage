@@ -9,3 +9,7 @@ output "findings_table" {
 output "parser_function" {
   value = aws_lambda_function.parser.function_name
 }
+
+output "trail_name" {
+  value = aws_cloudtrail.main.name
+}
